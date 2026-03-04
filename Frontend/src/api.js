@@ -1,9 +1,10 @@
 import axios from "axios";
 
 /**
- * Base URL of FastAPI backend
+ * 🌐 Dynamic Base URL
+ * Uses Vercel environment variable in production, falls back to localhost for dev.
  */
-const API_BASE_URL = "http://localhost:8001";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://dinevibe1.vercel.app";
 
 /**
  * Axios instance
@@ -16,7 +17,7 @@ const api = axios.create({
 });
 
 /**
- * 🔐 REQUEST INTERCEPTOR
+ * REQUEST INTERCEPTOR
  * Attaches JWT token to EVERY protected request
  */
 api.interceptors.request.use(
@@ -33,7 +34,7 @@ api.interceptors.request.use(
 );
 
 /**
- * 🚨 RESPONSE INTERCEPTOR
+ * RESPONSE INTERCEPTOR
  * Auto logout on token expiry / invalid token
  */
 api.interceptors.response.use(
@@ -45,7 +46,9 @@ api.interceptors.response.use(
       localStorage.removeItem("access_token");
       sessionStorage.removeItem("temp_token");
 
-      window.location.href = "/login";
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
     }
 
     return Promise.reject(error);
