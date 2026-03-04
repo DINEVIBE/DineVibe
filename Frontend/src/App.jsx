@@ -10,7 +10,7 @@ import DashboardHome from "./pages/DashboardHome";
 import Reservations from "./pages/Reservations";
 import Staff from "./pages/Staff";
 import Analytics from "./pages/Analytics";
-import {CRM} from "./pages/CRM";
+import CRM from "./pages/CRM"; 
 import Settings from "./pages/Settings";
 import Audit from "./pages/Audit";
 
