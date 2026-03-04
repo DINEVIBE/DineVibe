@@ -1,16 +1,23 @@
 fastapi
 uvicorn[standard]
 
+# Database
 sqlalchemy>=2.0
 asyncpg
-psycopg2-binary
+psycopg2-binary  
 
+# Validation
 pydantic>=2.0
 pydantic-settings
 
+# Security
 python-jose
 passlib[bcrypt]
 
+# Utils
 python-dotenv
-
 alembic
+
+# REQUIRED for Vercel/Production
+gunicorn
+httpx
