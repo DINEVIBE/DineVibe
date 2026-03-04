@@ -1,20 +1,30 @@
 {
   "version": 2,
   "builds": [
-    { 
-      "src": "Backend/app/main.py", 
-      "use": "@vercel/python" 
+    {
+      "src": "Backend/app/main.py",
+      "use": "@vercel/python"
     },
-    { 
-      "src": "Frontend/package.json", 
-      "use": "@vercel/static-build", 
-      "config": { "distDir": "dist" } 
+    {
+      "src": "Frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "npm run build",
+        "distDir": "dist"
+      }
     }
   ],
   "routes": [
-    { "src": "/auth/(.*)", "dest": "Backend/app/main.py" },
-    { "src": "/api/(.*)", "dest": "Backend/app/main.py" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "Frontend/dist/index.html" }
+    {
+      "src": "/api/(.*)",
+      "dest": "Backend/app/main.py"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "Frontend/dist/index.html"
+    }
   ]
 }
