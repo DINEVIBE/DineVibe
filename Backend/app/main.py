@@ -1,3 +1,10 @@
+import sys
+import os
+
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
 import uvicorn
 import traceback
 from fastapi import FastAPI, Request
@@ -5,9 +12,8 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-
-from .routes import auth, user, admin, mfa
-from .database.base import init_db
+from app.routes import auth, user, admin, mfa
+from app.database.base import init_db
 
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
@@ -62,7 +68,6 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     return response
 
-# Health check endpoints
 @app.get("/")
 async def health_check():
     return {"status": "ok"}
