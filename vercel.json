@@ -16,14 +16,15 @@
       }
     }
   ],
-  "rewrites": [
+  "routes": [
+    { "handle": "filesystem" },
     {
-      "source": "/api/(.*)",
-      "destination": "Backend/app/main.py"
+      "src": "/api/(.*)",
+      "dest": "Backend/app/main.py"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
