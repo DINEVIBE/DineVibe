@@ -75,11 +75,10 @@ async def health_check():
 async def api_health():
     return {"status": "ok", "message": "API is running"}
 
-# ✅ No prefix here — routers define their own
-app.include_router(auth.router)
-app.include_router(user.router)
-app.include_router(admin.router)
-app.include_router(mfa.router)
+app.include_router(auth.router, prefix="/api/auth")
+app.include_router(user.router, prefix="/api/user")
+app.include_router(admin.router, prefix="/api/admin")
+app.include_router(mfa.router, prefix="/api/mfa")
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8001, reload=True)

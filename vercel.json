@@ -9,21 +9,26 @@
       }
     },
     {
-      "src": "Frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "src": "Frontend/dist/**",
+      "use": "@vercel/static"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "Backend/app/main.py"
+      "src": "/api/(.*)",
+      "dest": "Backend/app/main.py"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/assets/(.*)",
+      "dest": "Frontend/dist/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|ico|png|jpg|svg|woff|woff2))",
+      "dest": "Frontend/dist/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "Frontend/dist/index.html"
     }
   ]
 }
