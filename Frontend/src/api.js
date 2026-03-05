@@ -2,8 +2,9 @@ import axios from "axios";
 
 /**
  * Base URL of FastAPI backend
+ * Prioritizes Vercel Env Var, then Production URL, then Localhost
  */
-const API_BASE_URL = "http://localhost:8001";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://dinevibe1.vercel.app" || "http://localhost:8001";
 
 /**
  * Axios instance

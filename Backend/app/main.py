@@ -2,26 +2,24 @@ import uvicorn
 import traceback
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 from app.routes import auth, user, admin, mfa
 from app.database.base import init_db
 
-# -------------------------------------------------
-# APP LIFESPAN
-# -------------------------------------------------
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://dinevibe1.vercel.app",
+]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("🚀 Starting DineVibe backend...")
-    await init_db()   # Ensure tables exist
+    await init_db()
     yield
     print("🛑 Shutting down DineVibe backend...")
-
-# -------------------------------------------------
-# FASTAPI INITIALIZATION
-# -------------------------------------------------
 
 app = FastAPI(
     title="DineVibe SaaS Backend",
@@ -29,25 +27,18 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# -------------------------------------------------
-# CORS 
-# -------------------------------------------------
-
+# ✅ Cleaned up CORS - Only one instance needed
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # -------------------------------------------------
-# SECURITY HEADERS (EXCEPTION SAFE)
+# SECURITY HEADERS (EXCEPTION SAFE + CORS AWARE)
 # -------------------------------------------------
-
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     try:
@@ -56,43 +47,35 @@ async def add_security_headers(request: Request, call_next):
         print("🔥 UNHANDLED SERVER ERROR:")
         traceback.print_exc()
 
-        return JSONResponse(
+        error_response = JSONResponse(
             status_code=500,
             content={"detail": str(e)}
         )
+
+        origin = request.headers.get("origin", "")
+        if origin in ALLOWED_ORIGINS:
+            error_response.headers["Access-Control-Allow-Origin"] = origin
+            error_response.headers["Access-Control-Allow-Credentials"] = "true"
+
+        return error_response
 
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"
     response.headers["X-XSS-Protection"] = "1; mode=block"
-
     return response
 
 # -------------------------------------------------
-# ROUTERS
+# ROUTERS - Added /api prefix to match Frontend
 # -------------------------------------------------
-
-app.include_router(auth.router)
-app.include_router(user.router)
-app.include_router(admin.router)
-app.include_router(mfa.router)
-
-# -------------------------------------------------
-# HEALTH CHECK
-# -------------------------------------------------
+app.include_router(auth.router, prefix="/api")
+app.include_router(user.router, prefix="/api/user")
+app.include_router(admin.router, prefix="/api/admin")
+app.include_router(mfa.router, prefix="/api/mfa")
 
 @app.get("/")
 async def health_check():
     return {"status": "ok"}
 
-# -------------------------------------------------
-# LOCAL DEV
-# -------------------------------------------------
-
 if __name__ == "__main__":
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=8001,
-        reload=True
-    )
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8001, reload=True)
