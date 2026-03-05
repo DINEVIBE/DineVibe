@@ -27,19 +27,24 @@ export default function MFA() {
   }, []);
 
   const handleOtpChange = (value, index) => {
-    if (!/^\d?$/.test(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    if (value && index < 5) document.getElementById(`otp-${index + 1}`)?.focus();
-  };
+  if (!/^\d?/.test(value)) return;
+  const newOtp = [...otp];
+  newOtp[index] = value;
+  setOtp(newOtp);
+  
+  // ✅ FIX: Corrected template literal for focus
+  if (value && index < 5) {
+    const nextInput = document.getElementById(`otp-${index + 1}`);
+    if (nextInput) nextInput.focus();
+  }
+};
 
   const handleSelectMethod = async (selectedMethod) => {
     setError("");
     setMethod(selectedMethod);
     setOtp(["", "", "", "", "", ""]);
     try {
-      const res = await api.post("/auth/select-mfa", { email, method: selectedMethod });
+      const res = await api.post("/api/auth/select-mfa", { email, method: selectedMethod });
       if (selectedMethod === "authenticator") {
         setQrUrl(res.data.qr_url);
         setManualKey(res.data.manual_key);
@@ -55,7 +60,7 @@ export default function MFA() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.post("/auth/verify-otp", { email, otp: otp.join("") });
+      const res = await api.post("/api/auth/verify-otp", { email, otp: otp.join("") });
       
       if (res.data.status === "MFA_SETUP_COMPLETE" || res.data.status === "SUCCESS") {
         // SAVE USER DATA HERE

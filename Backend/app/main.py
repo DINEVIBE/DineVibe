@@ -27,7 +27,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# ✅ Cleaned up CORS - Only one instance needed
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -36,9 +35,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -------------------------------------------------
-# SECURITY HEADERS (EXCEPTION SAFE + CORS AWARE)
-# -------------------------------------------------
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     try:
@@ -46,17 +42,14 @@ async def add_security_headers(request: Request, call_next):
     except Exception as e:
         print("🔥 UNHANDLED SERVER ERROR:")
         traceback.print_exc()
-
         error_response = JSONResponse(
             status_code=500,
             content={"detail": str(e)}
         )
-
         origin = request.headers.get("origin", "")
         if origin in ALLOWED_ORIGINS:
             error_response.headers["Access-Control-Allow-Origin"] = origin
             error_response.headers["Access-Control-Allow-Credentials"] = "true"
-
         return error_response
 
     response.headers["X-Content-Type-Options"] = "nosniff"
@@ -65,9 +58,6 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     return response
 
-# -------------------------------------------------
-# ROUTERS - Added /api prefix to match Frontend
-# -------------------------------------------------
 app.include_router(auth.router, prefix="/api")
 app.include_router(user.router, prefix="/api/user")
 app.include_router(admin.router, prefix="/api/admin")
