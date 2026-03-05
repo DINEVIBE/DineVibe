@@ -1,20 +1,29 @@
 {
   "version": 2,
   "builds": [
-    { 
-      "src": "Backend/app/main.py", 
-      "use": "@vercel/python" 
+    {
+      "src": "Backend/app/main.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     },
-    { 
-      "src": "Frontend/package.json", 
-      "use": "@vercel/static-build", 
-      "config": { "distDir": "dist" } 
+    {
+      "src": "Frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "Frontend/dist"
+      }
     }
   ],
   "rewrites": [
-    { "source": "/auth/(.*)", "destination": "Backend/app/main.py" },
-    { "source": "/api/(.*)", "destination": "Backend/app/main.py" },
-    { "handle": "filesystem" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "Backend/app/main.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
