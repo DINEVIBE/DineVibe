@@ -1,26 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "Backend/app/main.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb"
-      }
-    },
-    {
-      "src": "Frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
+  "buildCommand": "cd Frontend && npm install && npm run build",
+  "outputDirectory": "Frontend/dist",
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "Backend/app/main.py"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
