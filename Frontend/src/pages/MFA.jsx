@@ -39,7 +39,7 @@ export default function MFA() {
     setMethod(selectedMethod);
     setOtp(["", "", "", "", "", ""]);
     try {
-      const res = await api.post("/auth/select-mfa", { email, method: selectedMethod });
+      const res = await api.post("/api/auth/select-mfa", { email, method: selectedMethod });
       if (selectedMethod === "authenticator") {
         setQrUrl(res.data.qr_url);
         setManualKey(res.data.manual_key);
@@ -55,7 +55,7 @@ export default function MFA() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.post("/auth/verify-otp", { email, otp: otp.join("") });
+      const res = await api.post("/api/auth/verify-otp", { email, otp: otp.join("") });
       
       if (res.data.status === "MFA_SETUP_COMPLETE" || res.data.status === "SUCCESS") {
         // SAVE USER DATA HERE
