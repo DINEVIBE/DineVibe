@@ -7,6 +7,20 @@ import "../styles/auth.css";
 export default function SetPassword() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [complete, setComplete] = useState(false);
+
+  // ✅ THIS IS THE ONLY PART THAT MOVED. THIS GOES FIRST.
+  if (complete) {
+    return (
+      <div className="auth-wrapper">
+        <div className="auth-card text-center pt-8 pb-8">
+          <CheckCircle size={64} className="mx-auto mb-5 text-green-500" />
+          <h2>Password Updated</h2>
+          <p className="text-gray-500 mt-2">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    )
+  }
 
   const email =
     location.state?.email ||
@@ -31,9 +45,7 @@ export default function SetPassword() {
       uppercase: /[A-Z]/.test(newPassword),
       number: /\d/.test(newPassword),
       special: /[!@#$%^&*(),.?":{}|<>]/.test(newPassword),
-      match:
-        newPassword === confirmPassword &&
-        newPassword.length > 0,
+      match: newPassword === confirmPassword && newPassword.length > 0,
     });
   }, [newPassword, confirmPassword]);
 
@@ -62,8 +74,11 @@ export default function SetPassword() {
       });
 
       if (res.data.status === "SUCCESS") {
-        localStorage.setItem("access_token", res.data.access_token);
-        navigate("/home/dashboard");
+        setComplete(true)
+        setTimeout(() => {
+          localStorage.setItem("access_token", res.data.access_token);
+          navigate("/home/dashboard");
+        }, 2100)
       }
 
     } catch (err) {
