@@ -2,7 +2,7 @@
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
-from app.models.audit_log import AuditLog
+from models.audit_log import AuditLog
 
 
 async def create_audit_log(
