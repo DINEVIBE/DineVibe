@@ -12,10 +12,8 @@ export default function OTP() {
   const [error, setError] = useState("");
   const [timer, setTimer] = useState(60);
 
-  useEffect(() => {
-  }, [navigate]);
+  useEffect(() => {}, [navigate]);
 
-  // Timer countdown
   useEffect(() => {
     if (timer === 0) return;
     const interval = setInterval(() => {
@@ -31,7 +29,6 @@ export default function OTP() {
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Auto move to next input
     if (value && index < 5) {
       inputRefs.current[index + 1].focus();
     }
@@ -51,18 +48,24 @@ export default function OTP() {
     setError("");
 
     try {
-      const email = sessionStorage.getItem("otp_email");
+      const email = sessionStorage.getItem("otp_email") || sessionStorage.getItem("mfa_email");
+      const method = sessionStorage.getItem("mfa_method") || "email";
 
-      const res = await api.post("/auth/verify-otp", {
+      const res = await api.post("/api/auth/verify-otp", {
         email,
         otp: finalOtp,
+        method,
       });
 
-      localStorage.setItem("access_token", res.data.access_token);
-      localStorage.setItem("role", res.data.role);
-      sessionStorage.removeItem("otp_email");
+      if (res.data.status === "SUCCESS") {
+        localStorage.setItem("access_token", res.data.access_token);
+        localStorage.setItem("role", res.data.user?.role || res.data.role || "");
+        sessionStorage.removeItem("otp_email");
+        navigate("/home", { replace: true });
 
-      navigate("/home", { replace: true });
+      } else if (res.data.status === "MFA_SETUP_COMPLETE") {
+        navigate("/set-password", { state: { email } });
+      }
 
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid or expired OTP");
@@ -79,7 +82,7 @@ export default function OTP() {
         <h1 className="brand-title">DineVibe</h1>
         <p className="brand-subtitle">
           Secure verification required to continue.
-          We’ve sent a one-time password to your registered email.
+          We've sent a one-time password to your registered email.
         </p>
       </div>
 

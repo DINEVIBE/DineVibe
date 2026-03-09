@@ -1,27 +1,31 @@
+from app.database.base import init_db
+from app.routes import auth, user, admin, mfa
+from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request
+import traceback
+import uvicorn
 import sys
 import os
 
 # Ensure the app and parent directories are in the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), ".."))
 
-import uvicorn
-import traceback
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 
 # Import your route modules
-from app.routes import auth, user, admin, mfa
-from app.database.base import init_db
 
 # Ensure all frontend development ports and production domains are allowed
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
     "https://dinevibe1.vercel.app",
+    "https://dinevibe-git-main-dinevibe.vercel.app",
+    "https://dinevibe.vercel.app",
 ]
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -49,6 +53,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     try:
@@ -73,9 +78,11 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     return response
 
+
 @app.get("/")
 async def health_check():
     return {"status": "ok"}
+
 
 @app.get("/api/")
 async def api_health():

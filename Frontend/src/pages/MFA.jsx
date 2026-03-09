@@ -3,14 +3,14 @@ import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { ShieldCheck, Smartphone, Mail, KeyRound } from "lucide-react";
 import api from "../api";
 import "../styles/auth.css";
-import MFAComplete from "./MFAComplete"; 
+import MFAComplete from "./MFAComplete";
 
 export default function MFA() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const email = location.state?.email || sessionStorage.getItem("mfa_email");
-  const firstLogin = location.state?.firstLogin ?? true; 
+  const firstLogin = location.state?.firstLogin ?? true;
 
   const [method, setMethod] = useState("authenticator");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -18,7 +18,7 @@ export default function MFA() {
   const [error, setError] = useState("");
   const [qrUrl, setQrUrl] = useState("");
   const [manualKey, setManualKey] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false); 
+  const [showSuccess, setShowSuccess] = useState(false);
 
   if (!email) return <Navigate to="/login" replace />;
 
@@ -55,29 +55,28 @@ export default function MFA() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.post("/api/auth/verify-otp", { email, otp: otp.join("") });
-      
-      if (res.data.status === "MFA_SETUP_COMPLETE" || res.data.status === "SUCCESS") {
-        // SAVE USER DATA HERE
-        if (res.data.user) {
-          localStorage.setItem("user_name", res.data.user.name);
-          localStorage.setItem("user_email", res.data.user.email);
-        }
+      const res = await api.post("/api/auth/verify-otp", {
+        email,
+        otp: otp.join(""),
+        method,
+      });
 
+      if (res.data.status === "SUCCESS") {
+        localStorage.setItem("access_token", res.data.access_token);
+        localStorage.setItem("user_email", res.data.user?.email || email);
+        localStorage.setItem("user_name", res.data.user?.username || "");
+        localStorage.setItem("role", res.data.user?.role || res.data.role || "");
         setShowSuccess(true);
-        
-        setTimeout(() => {
-          if (res.data.status === "MFA_SETUP_COMPLETE") {
-            navigate("/set-password", { state: { email } });
-          } else {
-            localStorage.setItem("access_token", res.data.access_token);
-            localStorage.setItem("role", res.data.user.role);
-            navigate("/home/dashboard");
-          }
-        }, 2000);
+        setTimeout(() => navigate("/home/dashboard"), 2000);
+
+      } else if (res.data.status === "MFA_SETUP_COMPLETE") {
+        localStorage.setItem("user_email", res.data.user?.email || email);
+        localStorage.setItem("user_name", res.data.user?.username || "");
+        setShowSuccess(true);
+        setTimeout(() => navigate("/set-password", { state: { email } }), 2000);
       }
     } catch (err) {
-      setError("Invalid verification code.");
+      setError(err.response?.data?.detail || "Invalid verification code.");
     } finally {
       setLoading(false);
     }
@@ -93,7 +92,7 @@ export default function MFA() {
         <p>Restaurant Intelligence Platform</p>
       </div>
 
-      <div className={`auth-card ${firstLogin && method === "authenticator" ? 'setup-mode' : 'login-mode'}`}>
+      <div className={`auth-card ${firstLogin && method === "authenticator" ? "setup-mode" : "login-mode"}`}>
         <h2>Secure Your Account</h2>
         <p className="auth-subtitle">
           {firstLogin ? "Set up multi-factor authentication to protect your account" : "Enter your verification code"}
@@ -129,9 +128,9 @@ export default function MFA() {
             <div className="setup-step">
               <p className="step-label">Step 2: Scan this QR code</p>
               <div className="qr-wrapper">
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrUrl || 'DineVibe-Setup')}`} 
-                  alt="MFA QR Code" 
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrUrl || "DineVibe-Setup")}`}
+                  alt="MFA QR Code"
                 />
               </div>
               <p className="manual-label">Or enter this code manually:</p>
@@ -158,7 +157,7 @@ export default function MFA() {
               />
             ))}
           </div>
-          
+
           <div className="demo-notice">Demo: Use code <strong>123456</strong> to continue</div>
 
           <button className="primary-btn full-width" onClick={handleVerify} disabled={loading || otp.join("").length !== 6}>
