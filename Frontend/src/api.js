@@ -4,7 +4,7 @@ import axios from "axios";
  * 🌐 Dynamic Base URL
  * Uses Vercel environment variable in production, falls back to localhost for dev.
  */
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://dinevibe1.vercel.app";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://dinevibe-1yzd.onrender.com";
 
 /**
  * Axios instance
