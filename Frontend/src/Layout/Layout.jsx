@@ -1,146 +1,136 @@
-// Layout.jsx
 import { Outlet, Navigate, NavLink, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Search,
-  Heart,
-  Utensils,
-  Calendar,
-  TrendingUp,
-  Users,
-  ShieldCheck,
-  Briefcase,
-  Settings,
-  LogOut,
-  DollarSign,
-  Ticket,
-  Activity,
-  Eye,
-  ScrollText
+  LayoutDashboard, Search, Utensils, Briefcase, FileText, TrendingUp, 
+  Users, Layers, Settings, LogOut, ChevronDown, MoreHorizontal, Info
 } from "lucide-react";
 import "../styles/dashboard.css";
 
 export default function Layout() {
   const navigate = useNavigate();
   const token = localStorage.getItem("access_token");
-  const role = localStorage.getItem("role") || "user";
-  const userEmail = localStorage.getItem("user_email") || "";
-  const userName = localStorage.getItem("user_name") || "test";
+  const role = localStorage.getItem("role") || "admin";
+  const userEmail = localStorage.getItem("user_email") || "olivia@untitledui.com";
+  const userName = localStorage.getItem("user_name") || "Olivia Rhye";
 
   if (!token) return <Navigate to="/login" replace />;
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
-  // ✅ Role-Based Sidebar Configuration
-  const menuConfigs = {
-    user: [
-      { path: "/home/dashboard", label: "Home", icon: LayoutDashboard },
-      { path: "/home/user/discover", label: "Discover", icon: Search },
-      { path: "/home/user/saved", label: "Saved", icon: Heart, badge: "4" },
-      { path: "/home/user/preferences", label: "Preferences", icon: Settings }
-    ],
-    restaurant_owner: [
-      { path: "/home/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { path: "/home/owner/menu", label: "Menu Management", icon: Utensils },
-      { path: "/home/owner/reservations", label: "Reservations", icon: Calendar },
-      { path: "/home/owner/analytics", label: "Analytics", icon: TrendingUp }
-    ],
-
-    // ✅ UPDATED: admin menu now includes Impersonate + Audit Trail
-    admin: [
-      { path: "/home/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { path: "/home/admin/users", label: "User Management", icon: Users },
-      { path: "/home/admin/compliance", label: "Compliance", icon: ShieldCheck, badge: "5" },
-      { path: "/home/admin/impersonate", label: "Impersonate", icon: Eye },
-      { path: "/home/admin/audit", label: "Audit Trail", icon: ScrollText }
-      // If you still need system settings, add it back:
-      // { path: "/home/admin/settings", label: "System Settings", icon: Settings },
-    ],
-
-    creator: [
-      { path: "/home/dashboard", label: "Portfolio", icon: LayoutDashboard },
-      { path: "/home/creator/gigs", label: "Gig History", icon: Briefcase },
-      { path: "/home/creator/engagement", label: "Engagement", icon: TrendingUp },
-      { path: "/home/creator/revenue", label: "Revenue", icon: DollarSign },
-      { path: "/home/creator/verification", label: "Verification", icon: ShieldCheck }
-    ],
-
-    // ✅ staff menu includes Tickets + Activity Logs
-    staff: [
-      { path: "/home/dashboard", label: "My Tasks", icon: Briefcase },
-      { path: "/home/staff/schedule", label: "Shift Schedule", icon: Calendar },
-      { path: "/home/staff/tickets", label: "Tickets", icon: Ticket, badge: "2" },
-      { path: "/home/staff/activity", label: "Activity Logs", icon: Activity }
-    ]
-  };
-
-  const currentMenu = menuConfigs[role] || menuConfigs.user;
+  const menuItems = [
+    { path: "/home/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { path: "/home/admin/orders", label: "Orders", icon: FileText },
+    { path: "/home/owner/menu", label: "Menu Management", icon: Utensils },
+    { path: "/home/admin/qr", label: "QR Management", icon: Briefcase },
+    { path: "/home/admin/invoices", label: "Invoices", icon: FileText },
+    { path: "/home/admin/marketing", label: "Marketing", icon: TrendingUp },
+    { path: "/home/admin/users", label: "User Roles", icon: Users },
+    { path: "/home/admin/content", label: "Content", icon: Layers },
+    { path: "/home/settings", label: "Settings", icon: Settings },
+  ];
 
   return (
     <div className="modern-layout">
-      {/* ── SIDEBAR ── */}
-      <aside className="modern-sidebar">
+      {/* ── SIDEBAR CONTAINER ── */}
+      <aside className="modern-sidebar" style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'space-between', 
+        height: '100vh',
+        padding: '24px 16px' 
+      }}>
+        
+        {/* TOP GROUP: Logo, Search, Navigation */}
         <div className="sidebar-top-group">
-          <div className="sidebar-logo-container">
-            <div className="logo-brand-icon">D</div>
-            <div className="logo-text-group">
-              <h1 className="brand-name-sidebar">DineVibe</h1>
-              <p className="role-badge-text">{role.replace("_", " ").toUpperCase()}</p>
-            </div>
+          <div className="sidebar-brand-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', padding: '0 8px' }}>
+            <h1 className="brand-title" style={{ fontSize: '18px', fontWeight: '800', margin: 0 }}>Rest. Admin</h1>
+            <button className="sidebar-toggle-btn" style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+              <MoreHorizontal size={20} />
+            </button>
           </div>
 
-          <nav className="sidebar-nav-links">
-            {currentMenu.map((item) => (
+          <div className="sidebar-search-container" style={{ position: 'relative', marginBottom: '24px', padding: '0 8px' }}>
+            <Search size={18} className="search-icon" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+            <input 
+              type="text" 
+              placeholder="Search" 
+              className="sidebar-search-input" 
+              style={{ width: '100%', padding: '10px 12px 10px 38px', borderRadius: '8px', border: '1px solid #f1f5f9', background: '#fff', fontSize: '14px' }}
+            />
+          </div>
+
+          <nav className="sidebar-nav-links" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {menuItems.map((item) => (
               <NavLink
                 key={item.label}
                 to={item.path}
                 className={({ isActive }) => `sidebar-nav-item ${isActive ? "active" : ""}`}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: isActive ? '#1e293b' : '#64748b',
+                  background: isActive ? '#f8fafc' : 'transparent',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                })}
               >
-                <item.icon size={20} className="nav-icon" />
-                <span className="nav-label">{item.label}</span>
-                {item.badge && <span className="nav-count-badge">{item.badge}</span>}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <item.icon size={20} />
+                  <span>{item.label}</span>
+                </div>
+                <ChevronDown size={14} style={{ opacity: 0.5 }} />
               </NavLink>
             ))}
           </nav>
         </div>
 
-        <div className="sidebar-footer-group">
-          <div className="user-profile-mini-card">
-            <div className="avatar-circle-sm">{userName.charAt(0).toUpperCase()}</div>
-            <div className="user-mini-meta">
-              <p className="mini-user-name">{userName}</p>
-              <p className="mini-user-email">{userEmail}</p>
+        {/* BOTTOM GROUP: Upgrade Card & Profile */}
+        <div className="sidebar-footer-group" style={{ display: 'flex', flexDirection: 'column', gap: '24px', padding: '0 8px' }}>
+          
+          {/* Upgrade Card matched to image_b53397.jpg */}
+          <div className="upgrade-card" style={{ background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px', padding: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <p style={{ fontSize: '13px', fontWeight: '700', margin: 0, color: '#1e293b' }}>Manage Subscription plan</p>
+              <Info size={14} style={{ color: '#94a3b8' }} />
+            </div>
+            <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 12px 0', lineHeight: '1.4' }}>
+              You’ve used 80% of your 5 GB storage. Upgrade for more space & features.
+            </p>
+            <div style={{ height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden', marginBottom: '12px' }}>
+              <div style={{ width: '80%', height: '100%', background: '#6366f1' }}></div>
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: '700', color: '#64748b', cursor: 'pointer', padding: 0 }}>Dismiss</button>
+              <button style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: '700', color: '#6366f1', cursor: 'pointer', padding: 0 }}>Upgrade plan</button>
             </div>
           </div>
 
-          <button onClick={handleLogout} className="logout-sidebar-btn">
-            <LogOut size={18} />
-            <span>Sign Out</span>
-          </button>
+          {/* Profile Section */}
+          <div className="user-profile-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '20px', borderTop: '1px solid #f1f5f9' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <img 
+                src={`https://ui-avatars.com/api/?name=${userName}&background=f97316&color=fff`} 
+                alt="Avatar" 
+                style={{ width: '40px', height: '40px', borderRadius: '50%' }} 
+              />
+              <div style={{ overflow: 'hidden' }}>
+                <p style={{ fontSize: '14px', fontWeight: '700', margin: 0, color: '#1e293b', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{userName}</p>
+                <p style={{ fontSize: '12px', color: '#64748b', margin: 0, whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{userEmail}</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => { localStorage.clear(); navigate("/login"); }} 
+              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
       </aside>
 
-      <main className="main-area">
-        <div className="content-area">
-          {userEmail === "test@dinevibe.com" && (
-            <div className="simulation-banner">
-              <div className="flex items-center gap-2">
-                <div className="sim-indicator-dot"></div>
-                <span>
-                  Currently Simulating: <strong>{role.toUpperCase()}</strong>
-                </span>
-              </div>
-              <button onClick={() => navigate("/select-role")} className="btn-switch-persona">
-                Switch Persona
-              </button>
-            </div>
-          )}
-
-          <Outlet />
-        </div>
+      <main className="main-area" style={{ flex: 1, overflowY: 'auto', background: '#fff' }}>
+        <Outlet />
       </main>
     </div>
   );

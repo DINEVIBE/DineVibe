@@ -4,6 +4,7 @@ import { useState } from "react";
 // ── Layout & Core ──────────────────────────────────────────────────────────
 import Layout from "./Layout/Layout";
 import Login from "./pages/Login";
+import Register from "./pages/Register"; 
 import MFA from "./pages/MFA";
 import InfluencerLogin from "./pages/InfluencerLogin";
 import SetPassword from "./pages/SetPassword";
@@ -16,7 +17,7 @@ import UserDashboard from "./pages/UserDashboard";
 import RestaurantOwnerDashboard from "./pages/RestaurantOwnerDashboard";
 import CreatorDashboard from "./pages/CreatorDashboard";
 
-// ✅ Staff pages (named exports from StaffDashboard.jsx)
+// Staff pages
 import StaffDashboard, {
   StaffSchedule,
   StaffTickets,
@@ -45,7 +46,6 @@ function App() {
     role: getRole() || "admin"
   });
 
-  // ── Protection Logic ──
   const ProtectedRoute = ({ children }) => {
     if (!getToken()) return <Navigate to="/login" replace />;
     return children;
@@ -62,13 +62,13 @@ function App() {
     return children;
   };
 
-  // ── Dynamic Root Switcher ──
   const RoleDashboard = () => {
     const role = getRole();
     const user = getUser();
     switch (role) {
       case "admin":
-        return <AdminDashboard user={user} activeTab="overview" />;
+        // Shows the high-fidelity Menu Management view inside AdminDashboard
+        return <AdminDashboard user={user} activeTab="menu" />;
       case "restaurant_owner":
         return <RestaurantOwnerDashboard user={user} activeTab="overview" />;
       case "creator":
@@ -91,11 +91,12 @@ function App() {
           element={getToken() ? <Navigate to="/home/dashboard" replace /> : <Navigate to="/login" replace />}
         />
 
-        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/mfa" element={<MFA />} />
         <Route path="/set-password" element={<SetPassword />} />
         <Route path="/influencer-login" element={<InfluencerLogin />} />
+        
         <Route
           path="/select-role"
           element={
@@ -105,7 +106,6 @@ function App() {
           }
         />
 
-        {/* Protected Dashboard Layout */}
         <Route
           path="/home"
           element={
@@ -117,89 +117,24 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<RoleDashboard />} />
 
-          {/* ── ADMIN ROUTES ── */}
-          <Route
-            path="admin/users"
-            element={
-              <RoleProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboard user={getUser()} activeTab="users" />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="admin/compliance"
-            element={
-              <RoleProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboard user={getUser()} activeTab="compliance" />
-              </RoleProtectedRoute>
-            }
-          />
+          {/* Admin Routes */}
+          <Route path="admin/users" element={<RoleProtectedRoute allowedRoles={["admin"]}><AdminDashboard user={getUser()} activeTab="users" /></RoleProtectedRoute>} />
+          <Route path="admin/compliance" element={<RoleProtectedRoute allowedRoles={["admin"]}><AdminDashboard user={getUser()} activeTab="compliance" /></RoleProtectedRoute>} />
+          <Route path="admin/regions" element={<RoleProtectedRoute allowedRoles={["admin"]}><AdminDashboard user={getUser()} activeTab="regions" /></RoleProtectedRoute>} />
+          <Route path="admin/impersonate" element={<RoleProtectedRoute allowedRoles={["admin"]}><AdminDashboard user={getUser()} activeTab="impersonate" /></RoleProtectedRoute>} />
+          <Route path="admin/audit" element={<RoleProtectedRoute allowedRoles={["admin"]}><AdminDashboard user={getUser()} activeTab="audit" /></RoleProtectedRoute>} />
 
-          {/* ✅ ADDED: Regions / Impersonate / Audit Trail routes (to match sidebar) */}
-          <Route
-            path="admin/regions"
-            element={
-              <RoleProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboard user={getUser()} activeTab="regions" />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="admin/impersonate"
-            element={
-              <RoleProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboard user={getUser()} activeTab="impersonate" />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="admin/audit"
-            element={
-              <RoleProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboard user={getUser()} activeTab="audit" />
-              </RoleProtectedRoute>
-            }
-          />
+          {/* User Routes */}
+          <Route path="user/saved" element={<RoleProtectedRoute allowedRoles={["user", "normal_user"]}><UserDashboard user={getUser()} activeTab="saved" /></RoleProtectedRoute>} />
+          <Route path="user/preferences" element={<RoleProtectedRoute allowedRoles={["user", "normal_user"]}><UserDashboard user={getUser()} activeTab="preferences" /></RoleProtectedRoute>} />
+          <Route path="user/discover" element={<RoleProtectedRoute allowedRoles={["user", "normal_user"]}><UserDashboard user={getUser()} activeTab="home" /></RoleProtectedRoute>} />
+          <Route path="restaurant/:id" element={<RoleProtectedRoute allowedRoles={["user", "normal_user", "admin"]}><RestaurantDetail /></RoleProtectedRoute>} />
 
-          {/* ── USER ROUTES ── */}
-          <Route
-            path="user/saved"
-            element={
-              <RoleProtectedRoute allowedRoles={["user", "normal_user"]}>
-                <UserDashboard user={getUser()} activeTab="saved" />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="user/preferences"
-            element={
-              <RoleProtectedRoute allowedRoles={["user", "normal_user"]}>
-                <UserDashboard user={getUser()} activeTab="preferences" />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="user/discover"
-            element={
-              <RoleProtectedRoute allowedRoles={["user", "normal_user"]}>
-                <UserDashboard user={getUser()} activeTab="home" />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="restaurant/:id"
-            element={
-              <RoleProtectedRoute allowedRoles={["user", "normal_user", "admin"]}>
-                <RestaurantDetail />
-              </RoleProtectedRoute>
-            }
-          />
-
-          {/* ── RESTAURANT OWNER ROUTES ── */}
+          {/* Restaurant Owner Routes - UPDATED allowedRoles to include "admin" */}
           <Route
             path="owner/menu"
             element={
-              <RoleProtectedRoute allowedRoles={["restaurant_owner"]}>
+              <RoleProtectedRoute allowedRoles={["restaurant_owner", "admin"]}>
                 <MenuManagement />
               </RoleProtectedRoute>
             }
@@ -207,7 +142,7 @@ function App() {
           <Route
             path="owner/reservations"
             element={
-              <RoleProtectedRoute allowedRoles={["restaurant_owner"]}>
+              <RoleProtectedRoute allowedRoles={["restaurant_owner", "admin"]}>
                 <Reservations />
               </RoleProtectedRoute>
             }
@@ -215,89 +150,23 @@ function App() {
           <Route
             path="owner/analytics"
             element={
-              <RoleProtectedRoute allowedRoles={["restaurant_owner"]}>
+              <RoleProtectedRoute allowedRoles={["restaurant_owner", "admin"]}>
                 <Analytics />
               </RoleProtectedRoute>
             }
           />
-          <Route
-            path="owner/reviews"
-            element={
-              <RoleProtectedRoute allowedRoles={["restaurant_owner"]}>
-                <RestaurantOwnerDashboard user={getUser()} activeTab="reviews" />
-              </RoleProtectedRoute>
-            }
-          />
 
-          {/* ── CREATOR ROUTES ── */}
-          <Route
-            path="creator/gigs"
-            element={
-              <RoleProtectedRoute allowedRoles={["creator"]}>
-                <CreatorDashboard user={getUser()} activeTab="gigs" />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="creator/engagement"
-            element={
-              <RoleProtectedRoute allowedRoles={["creator"]}>
-                <CreatorDashboard user={getUser()} activeTab="engagement" />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="creator/revenue"
-            element={
-              <RoleProtectedRoute allowedRoles={["creator"]}>
-                <CreatorDashboard user={getUser()} activeTab="revenue" />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="creator/verification"
-            element={
-              <RoleProtectedRoute allowedRoles={["creator"]}>
-                <CreatorDashboard user={getUser()} activeTab="verification" />
-              </RoleProtectedRoute>
-            }
-          />
+          {/* Creator Routes */}
+          <Route path="creator/gigs" element={<RoleProtectedRoute allowedRoles={["creator"]}><CreatorDashboard user={getUser()} activeTab="gigs" /></RoleProtectedRoute>} />
+          <Route path="creator/engagement" element={<RoleProtectedRoute allowedRoles={["creator"]}><CreatorDashboard user={getUser()} activeTab="engagement" /></RoleProtectedRoute>} />
+          <Route path="creator/revenue" element={<RoleProtectedRoute allowedRoles={["creator"]}><CreatorDashboard user={getUser()} activeTab="revenue" /></RoleProtectedRoute>} />
+          <Route path="creator/verification" element={<RoleProtectedRoute allowedRoles={["creator"]}><CreatorDashboard user={getUser()} activeTab="verification" /></RoleProtectedRoute>} />
 
-          {/* ── STAFF ROUTES ── */}
-          <Route
-            path="staff"
-            element={
-              <RoleProtectedRoute allowedRoles={["staff"]}>
-                <Navigate to="/home/dashboard" replace />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="staff/schedule"
-            element={
-              <RoleProtectedRoute allowedRoles={["staff"]}>
-                <StaffSchedule />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="staff/tickets"
-            element={
-              <RoleProtectedRoute allowedRoles={["staff"]}>
-                <StaffTickets />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
-            path="staff/activity"
-            element={
-              <RoleProtectedRoute allowedRoles={["staff"]}>
-                <StaffActivityLogs />
-              </RoleProtectedRoute>
-            }
-          />
+          {/* Staff Routes */}
+          <Route path="staff/schedule" element={<RoleProtectedRoute allowedRoles={["staff"]}><StaffSchedule /></RoleProtectedRoute>} />
+          <Route path="staff/tickets" element={<RoleProtectedRoute allowedRoles={["staff"]}><StaffTickets /></RoleProtectedRoute>} />
+          <Route path="staff/activity" element={<RoleProtectedRoute allowedRoles={["staff"]}><StaffActivityLogs /></RoleProtectedRoute>} />
 
-          {/* Common */}
           <Route path="settings" element={<Settings />} />
         </Route>
 

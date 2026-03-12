@@ -1,696 +1,360 @@
 /* =========================================
-   GLOBAL WRAPPER
+   GLOBAL WRAPPER & BRANDING
 ========================================= */
-
 .auth-wrapper {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f4f6f9, #e2e8f0);
+  background: #ffffff; /* Clean white background per latest Figma */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-family: "Inter", sans-serif;
   padding: 20px;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
 }
-
-/* =========================================
-   LOGO SECTION
-========================================= */
-
-.auth-logo {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.logo-icon {
-  width: 56px;
-  height: 56px;
-  background: #4f46e5;
-  color: white;
-  border-radius: 14px;
+/* Branding Top Left - EXACT FONT MATCH */
+.brand-logo { 
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  /* DINE part styling */
+  font-family: "Inter", "Helvetica Neue", sans-serif;
+  font-weight: 800; 
+  font-size: 30px; 
+  letter-spacing: -1px; 
+  color: #000000;
+  text-transform: uppercase;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 12px;
-  font-size: 24px;
+  align-items: baseline;
 }
 
-.auth-logo h1 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-}
-
-.auth-logo p {
-  margin-top: 6px;
-  font-size: 14px;
-  color: #6b7280;
+/* VIBE part styling - High Contrast Serif */
+.brand-logo .accent { 
+  font-family: "Times New Roman", "Garamond", serif;
+  font-weight: 300; /* Light/Thin weight */
+  color: #f97316; 
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  margin-left: 1px;
 }
 
 /* =========================================
-   CARD
+   TYPOGRAPHY
 ========================================= */
-
-.auth-card {
-  width: 420px;
-  max-width: 100%;
-  background: white;
-  padding: 32px;
-  border-radius: 14px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+.figma-title { 
+  font-size: 34px; 
+  font-weight: 800; 
+  color: #000; 
+  margin-bottom: 32px; 
+  letter-spacing: -1.2px; 
 }
 
-.auth-card h2 {
-  margin-bottom: 6px;
-  font-size: 22px;
-  font-weight: 600;
-}
-
-.auth-subtitle {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 20px;
+.figma-input-hint { 
+  font-size: 15px; 
+  color: #374151; 
+  font-weight: 600; 
+  margin-bottom: 20px; 
 }
 
 /* =========================================
-   ERROR MESSAGE
+   METHOD SELECTION (Vertical List)
 ========================================= */
-
-.auth-error {
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 10px 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-size: 14px;
+.method-list-container { 
+  border: 1.5px solid #f1f5f9; 
+  border-radius: 28px; 
+  overflow: hidden; 
+  margin-bottom: 40px; 
+  background: #fff;
 }
 
-/* =========================================
-   INPUT GROUP
-========================================= */
-
-.auth-input-group {
-  margin-bottom: 16px;
+.method-row { 
+  padding: 28px 32px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  cursor: pointer; 
+  transition: all 0.2s ease;
 }
 
-.auth-input-group label {
-  display: block;
-  font-size: 13px;
-  margin-bottom: 6px;
-  color: #374151;
+.method-row:not(:last-child) { 
+  border-bottom: 1.5px solid #f1f5f9; 
 }
 
-.auth-input {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid #d1d5db;
-  padding: 10px 12px;
-  border-radius: 8px;
-  transition: 0.2s ease;
+.method-row.selected { 
+  background: #f8fafc; 
 }
 
-.auth-input:focus-within {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+.method-label { 
+  font-weight: 800; 
+  font-size: 18px; 
+  color: #000; 
+  margin-bottom: 4px; 
 }
 
-.auth-input input {
-  border: none;
-  outline: none;
-  flex: 1;
-  font-size: 14px;
-  background: transparent;
+.method-desc { 
+  font-size: 14px; 
+  color: #94a3b8; 
+  font-weight: 600; 
 }
 
-/* =========================================
-   FORGOT PASSWORD
-========================================= */
+/* Custom Radio Indicator */
+.custom-radio { 
+  width: 24px; 
+  height: 24px; 
+  border: 2px solid #e2e8f0; 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+}
 
-.forgot-password {
-  text-align: right;
-  font-size: 13px;
-  color: #4f46e5;
-  margin-bottom: 16px;
-  cursor: pointer;
+.selected .custom-radio { 
+  border-color: #f97316; 
+}
+
+.radio-inner { 
+  width: 12px; 
+  height: 12px; 
+  background: #f97316; 
+  border-radius: 50%; 
 }
 
 /* =========================================
    BUTTONS
 ========================================= */
-
-.primary-btn {
-  background: #4f46e5;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s ease;
-  font-size: 14px;
-  font-weight: 500;
+.figma-primary-btn { 
+  width: 100%; 
+  padding: 20px; 
+  border-radius: 18px; 
+  font-weight: 800; 
+  font-size: 16px; 
+  border: none; 
+  background: #111; 
+  color: #fff; 
+  cursor: pointer; 
+  transition: transform 0.1s ease, background 0.2s ease;
 }
 
-.primary-btn:hover {
-  background: #4338ca;
+.figma-primary-btn:active {
+  transform: scale(0.98);
 }
 
-.primary-btn:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-
-.secondary-btn {
-  background: white;
-  border: 1px solid #d1d5db;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.2s ease;
-}
-
-.secondary-btn:hover {
-  background: #f9fafb;
-}
-
-.full-width {
-  width: 100%;
+.figma-primary-btn.disabled { 
+  background: #e2e8f0; 
+  color: #94a3b8; 
+  cursor: not-allowed; 
 }
 
 /* =========================================
-   DIVIDER
+   OTP & QR CODE
 ========================================= */
-
-.auth-divider {
-  text-align: center;
-  margin: 20px 0;
-  position: relative;
+.otp-grid-figma { 
+  display: flex; 
+  gap: 12px; 
+  justify-content: center; 
+  margin-bottom: 40px; 
 }
 
-.auth-divider span {
-  background: white;
-  padding: 0 12px;
-  font-size: 13px;
-  color: #6b7280;
-  position: relative;
-  z-index: 1;
+.otp-square-figma { 
+  width: 58px; 
+  height: 72px; 
+  text-align: center; 
+  font-size: 26px; 
+  font-weight: 800; 
+  border: 1.5px solid #e2e8f0; 
+  border-radius: 16px; 
+  background: #f8fafc; 
+  outline: none; 
+  transition: border-color 0.2s ease;
 }
 
-.auth-divider::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 1px;
-  background: #e5e7eb;
-  top: 50%;
-  left: 0;
-  z-index: 0;
+.otp-square-figma:focus { 
+  border-color: #f97316; 
+  background: #fff; 
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+}
+
+.figma-dash { 
+  align-self: center; 
+  font-size: 28px; 
+  color: #cbd5e1; 
+  font-weight: 300; 
+}
+
+.qr-figma-container { 
+  background: #f3f4f6; 
+  border-radius: 24px; 
+  padding: 40px; 
+  display: flex; 
+  justify-content: center; 
+  margin-bottom: 32px; 
+}
+
+.qr-white-box { 
+  background: #fff; 
+  padding: 16px; 
+  border-radius: 12px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 /* =========================================
-   GOOGLE BUTTON
+   FOOTER & LINKS
 ========================================= */
+.figma-footer-text { 
+  text-align: center; 
+  margin-top: 28px; 
+  font-size: 14px; 
+}
 
-.google-btn {
-  width: 100%;
-  border: 1px solid #d1d5db;
-  background: white;
-  padding: 10px;
-  border-radius: 8px;
+.figma-footer-text span { 
+  color: #64748b; 
+  font-weight: 600; 
+}
+
+.try-another-link { 
+  background: none; 
+  border: none; 
+  color: #f97316; 
+  font-weight: 800; 
+  cursor: pointer; 
+  margin-left: 6px; 
+  text-decoration: none;
+}
+
+.try-another-link:hover {
+  text-decoration: underline;
+}
+
+/* =========================================
+   SUCCESS POPUP (Emerald Theme)
+========================================= */
+.success-container { 
+  text-align: center; 
+  background: #f0fdf4; 
+  border: 1px solid #dcfce7; 
+  padding: 70px; 
+  border-radius: 44px; 
+  width: 500px; 
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.success-icon-circle { 
+  background: #22c55e; 
+  width: 84px; 
+  height: 84px; 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  margin: 0 auto 24px; 
+}
+
+.success-title { 
+  font-size: 30px; 
+  font-weight: 900; 
+  color: #064e3b; 
+  margin-bottom: 10px; 
+}
+
+.success-subtitle { 
+  color: #059669; 
+  font-weight: 600; 
+}
+
+/* =========================================
+   ANIMATIONS & UTILS
+========================================= */
+.animate-in {
+  animation: fadeInZoom 0.4s ease-out forwards;
+}
+
+@keyframes fadeInZoom {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.back-btn-figma { 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  padding: 0; 
+  margin-bottom: 32px; 
+  color: #111;
+}
+
+.error-badge-figma { 
+  background: #fee2e2; 
+  color: #b91c1c; 
+  padding: 12px; 
+  border-radius: 10px; 
+  margin-bottom: 20px; 
+  text-align: center; 
+  font-weight: 600; 
+  font-size: 14px;
+}
+/* --- Strength Meter Figma Match --- */
+.strength-meter-container {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.2s ease;
+  margin-bottom: 24px;
+  width: 100%;
 }
 
-.google-btn:hover {
-  background: #f9fafb;
-}
-
-.google-btn img {
-  width: 18px;
-}
-
-/* =========================================
-   NOTE TEXT
-========================================= */
-
-.auth-note {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 14px;
-  text-align: center;
-}
-
-/* =========================================
-   MFA SECTION
-========================================= */
-
-.mfa-method-tabs {
+.meter-bars {
   display: flex;
-  gap: 6px;
-  margin-bottom: 18px;
-}
-
-.mfa-method-tabs button {
+  gap: 8px;
   flex: 1;
-  padding: 8px;
-  border: 1px solid #d1d5db;
-  background: white;
-  border-radius: 8px;
-  font-size: 13px;
+  margin-right: 15px;
+}
+
+.meter-bar {
+  height: 6px;
+  flex: 1;
+  background: #e2e8f0; /* Default Grey */
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.meter-bar.filled {
+  background: #2ecc71; /* Figma Green */
+}
+
+.strength-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  min-width: 40px;
+  text-align: right;
+}
+
+.strength-label.good {
+  color: #2ecc71;
+}
+
+/* --- Rule Item States --- */
+.figma-rule-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.mfa-method-tabs button.active {
-  background: #4f46e5;
-  color: white;
-  border: none;
-}
-
-.mfa-box {
-  background: #eef2ff;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  gap: 12px;
   font-size: 14px;
-}
-
-.mfa-qr {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 14px;
-}
-
-.mfa-qr img {
-  width: 180px;
-}
-
-.mfa-manual {
-  text-align: center;
-  font-size: 14px;
-  margin-bottom: 16px;
-}
-
-.otp-input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 16px;
-  text-align: center;
-  letter-spacing: 4px;
-}
-
-/* =========================================
-   PASSWORD RULES
-========================================= */
-.password-rules {
-  margin-top: 15px;
-  font-size: 13px;
-  color: #666;
-}
-
-.rule {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 5px 0;
-  opacity: 0.4;
+  font-weight: 600;
   transition: all 0.2s ease;
 }
 
-.rule.valid {
-  color: #2ecc71;
-  opacity: 1;
-  font-weight: 500;
+.figma-rule-item.is-invalid {
+  color: #f87171; /* Red Text */
 }
 
-
-
-/* =========================================
-   SUCCESS SCREEN
-========================================= */
-
-.success-card {
-  text-align: center;
-  padding: 40px 32px;
+.figma-rule-item.is-valid {
+  color: #10b981; /* Green Text */
 }
 
-.success-icon {
-  color: #16a34a;
-  margin-bottom: 16px;
-  display: flex;
-  justify-content: center;
+.icon-invalid {
+  color: #f87171; /* Red Icon */
 }
 
-.success-redirect-text {
-  font-size: 13px;
-  color: #6b7280;
-  margin-top: 12px;
-}
-
-/* =========================================
-   SUCCESS POPUP (Top Right)
-========================================= */
-
-.mfa-success-popup {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #16a34a;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 8px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 480px) {
-  .auth-card {
-    padding: 24px;
-  }
-
-  .auth-wrapper {
-    padding: 16px;
-  }
-}
-/* Recommended Banner */
-.recommended-method-banner {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  text-align: left;
-}
-.recommended-method-banner strong { color: #1e40af; font-size: 14px; display: block; }
-.recommended-method-banner p { color: #3b82f6; font-size: 12px; margin: 0; }
-
-/* Setup Steps */
-.setup-step { text-align: left; margin-bottom: 24px; }
-.step-title { font-weight: 600; font-size: 14px; margin-bottom: 12px; }
-
-.app-download-btns { display: flex; gap: 10px; }
-.app-btn {
-  flex: 1;
-  background: white;
-  border: 1px solid #e2e8f0;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.app-btn span { display: block; font-size: 10px; color: #94a3b8; font-weight: 400; }
-
-.qr-container { 
-  background: white; 
-  padding: 15px; 
-  border-radius: 12px; 
-  border: 1px solid #f1f5f9; 
-  display: inline-block;
-  margin-bottom: 12px;
-}
-
-.manual-text { font-size: 12px; color: #64748b; margin-bottom: 6px; }
-.manual-key-display {
-  background: #f8fafc;
-  padding: 10px;
-  border-radius: 6px;
-  font-family: monospace;
-  font-weight: bold;
-  letter-spacing: 1px;
-  border: 1px solid #e2e8f0;
-}
-
-/* OTP Styling */
-.otp-input-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
-.otp-box {
-  width: 45px;
-  height: 48px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 600;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 8px;
-  background: #f8fafc;
-}
-.otp-box:focus { border-color: #4f46e5; outline: none; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
-
-.demo-notice {
-  background: #fffbeb;
-  border: 1px solid #fef3c7;
-  color: #92400e;
-  font-size: 12px;
-  padding: 8px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-}
-/* Container sizing */
-.auth-card.setup-mode { max-width: 480px; }
-.auth-card.login-mode { max-width: 400px; }
-
-/* Recommended Banner */
-.recommended-banner {
-  background: #f0f7ff;
-  border: 1px solid #cce3ff;
-  padding: 12px;
-  border-radius: 8px;
-  text-align: left;
-  margin-bottom: 20px;
-}
-.recommended-banner strong { color: #1a56db; font-size: 14px; display: block; }
-.recommended-banner p { color: #3f83f8; font-size: 12px; margin: 0; }
-
-/* Setup Steps */
-.setup-step { text-align: left; margin-bottom: 20px; }
-.step-label { font-weight: 600; font-size: 14px; margin-bottom: 10px; }
-
-.app-grid { display: flex; gap: 8px; }
-.app-store-btn {
-  flex: 1;
-  background: white;
-  border: 1px solid #e5e7eb;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  text-align: center;
-}
-.app-store-btn span { display: block; font-size: 10px; color: #9ca3af; font-weight: 400; }
-
-.qr-wrapper {
-  background: white;
-  border: 1px solid #f3f4f6;
-  padding: 15px;
-  border-radius: 12px;
-  display: inline-block;
-  margin-bottom: 10px;
-}
-
-.manual-label { font-size: 12px; color: #6b7280; margin-bottom: 5px; }
-.manual-key {
-  background: #f9fafb;
-  padding: 10px;
-  border-radius: 6px;
-  font-family: monospace;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-align: center;
-  border: 1px solid #e5e7eb;
-}
-
-/* OTP Squares */
-.otp-container { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
-.otp-input-square {
-  width: 45px;
-  height: 50px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  border: 1.5px solid #d1d5db;
-  border-radius: 8px;
-  background: #fff;
-  transition: all 0.2s;
-}
-.otp-input-square:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-  outline: none;
-}
-
-.demo-notice {
-  background: #fffbeb;
-  border: 1px solid #fef3c7;
-  color: #92400e;
-  font-size: 12px;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-/* Card Mode Switching */
-.auth-card.setup-mode { max-width: 480px; }
-.auth-card.login-mode { max-width: 400px; }
-
-/* Recommended Banner (Figma Style) */
-.recommended-banner {
-  background: #f0f7ff;
-  border: 1px solid #cce3ff;
-  padding: 12px;
-  border-radius: 8px;
-  text-align: left;
-  margin-bottom: 20px;
-}
-.recommended-banner strong { color: #1a56db; font-size: 14px; display: block; }
-.recommended-banner p { color: #3f83f8; font-size: 12px; margin: 0; }
-
-/* Setup Steps */
-.setup-step { text-align: left; margin-bottom: 20px; }
-.step-label { font-weight: 600; font-size: 14px; margin-bottom: 10px; color: #374151; }
-
-.app-grid { display: flex; gap: 8px; }
-.app-store-btn {
-  flex: 1;
-  background: white;
-  border: 1px solid #e5e7eb;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  text-align: center;
-  cursor: pointer;
-}
-.app-store-btn span { display: block; font-size: 10px; color: #9ca3af; font-weight: 400; }
-
-/* QR and Manual Entry */
-.qr-wrapper {
-  background: white;
-  border: 1px solid #f3f4f6;
-  padding: 15px;
-  border-radius: 12px;
-  display: inline-block;
-  margin-bottom: 10px;
-}
-.manual-label { font-size: 12px; color: #6b7280; margin-bottom: 5px; }
-.manual-key {
-  background: #f9fafb;
-  padding: 10px;
-  border-radius: 6px;
-  font-family: monospace;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-align: center;
-  border: 1px solid #e5e7eb;
-}
-
-/* OTP Grid Styling */
-.input-label { display: block; text-align: left; font-size: 13px; margin-bottom: 8px; color: #4b5563; }
-.otp-container { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
-.otp-input-square {
-  width: 45px;
-  height: 50px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  border: 1.5px solid #d1d5db;
-  border-radius: 8px;
-  background: #fff;
-}
-.otp-input-square:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); outline: none; }
-/* SUCCESS TOAST (TOP RIGHT) */
-.success-toast {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  background: #064e3b;
-  color: #ecfdf5;
-  padding: 12px 20px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  animation: slideIn 0.3s ease-out;
-  z-index: 1000;
-}
-
-.toast-icon {
-  background: #10b981;
-  border-radius: 50%;
-  padding: 2px;
-  display: flex;
-}
-
-/* CENTERED CARD */
-.success-card-center {
-  text-align: center;
-  padding: 48px 32px;
-  max-width: 400px;
-}
-
-.success-check-large {
-  background: #f0fdf4;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 24px;
-}
-
-/* LOADING BAR ANIMATION */
-.loading-bar-container {
-  width: 100%;
-  height: 4px;
-  background: #f1f5f9;
-  border-radius: 2px;
-  margin-top: 24px;
-  overflow: hidden;
-}
-
-.loading-bar-fill {
-  height: 100%;
-  background: #5b5ffb;
-  width: 0%;
-  animation: progress 2s linear forwards;
-}
-
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes progress {
-  from { width: 0%; }
-  to { width: 100%; }
+.icon-valid {
+  color: #10b981; /* Green Icon */
 }
