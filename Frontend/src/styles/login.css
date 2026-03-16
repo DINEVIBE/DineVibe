@@ -110,19 +110,69 @@
   cursor: pointer;
 }
 
+/* Keep your existing styles and add/update these specific sections */
+
 .form-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
   margin-bottom: 32px;
+  gap: 10px;
+  flex-wrap: nowrap;
 }
 
 .remember-me {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Phone Input Custom Styling to match your text inputs */
+.custom-phone {
+  width: 100% !important;
+}
+
+.custom-phone .react-international-phone-input {
+  width: 100% !important;
+  height: 54px !important; /* Matches your 16px padding + font size */
+  background: #f8fafc !important;
+  border: 1.5px solid #f1f5f9 !important;
+  border-left: none !important;
+  border-radius: 0 12px 12px 0 !important;
+  font-size: 16px !important;
+  outline: none !important;
+}
+
+.custom-phone .react-international-phone-country-selector-button {
+  height: 54px !important;
+  background: #f8fafc !important;
+  border: 1.5px solid #f1f5f9 !important;
+  border-radius: 12px 0 0 12px !important;
+  padding: 0 10px !important;
+}
+
+.custom-phone:focus-within .react-international-phone-input,
+.custom-phone:focus-within .react-international-phone-country-selector-button {
+  border-color: #f97316 !important;
+  background: #fff !important;
+}
+
+
+.remember-me input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.form-actions a {
+  color: #f97316;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .submit-btn {
@@ -188,6 +238,7 @@
 .login-right {
   flex: 1.1;
   padding: 24px;
+  display: block; /* Ensure visibility */
 }
 
 .orange-panel {

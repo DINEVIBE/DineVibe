@@ -7,13 +7,23 @@ import "../styles/dashboard.css";
 
 export default function Layout() {
   const navigate = useNavigate();
+  
+  // ✅ REAL DATA: Pulling from localStorage set during Login/OTP
   const token = localStorage.getItem("access_token");
   const role = localStorage.getItem("role") || "admin";
   const userEmail = localStorage.getItem("user_email") || "olivia@untitledui.com";
   const userName = localStorage.getItem("user_name") || "Olivia Rhye";
 
+  // Security Gate
   if (!token) return <Navigate to="/login" replace />;
 
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate("/login", { replace: true });
+  };
+
+  // Sidebar Menu Configuration
   const menuItems = [
     { path: "/home/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { path: "/home/admin/orders", label: "Orders", icon: FileText },
@@ -34,13 +44,16 @@ export default function Layout() {
         flexDirection: 'column', 
         justifyContent: 'space-between', 
         height: '100vh',
-        padding: '24px 16px' 
+        padding: '24px 16px',
+        borderRight: '1px solid #f1f5f9',
+        width: '280px',
+        background: '#fff'
       }}>
         
         {/* TOP GROUP: Logo, Search, Navigation */}
         <div className="sidebar-top-group">
           <div className="sidebar-brand-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', padding: '0 8px' }}>
-            <h1 className="brand-title" style={{ fontSize: '18px', fontWeight: '800', margin: 0 }}>Rest. Admin</h1>
+            <h1 className="brand-title" style={{ fontSize: '20px', fontWeight: '900', margin: 0, letterSpacing: '-0.5px' }}>Rest. Admin</h1>
             <button className="sidebar-toggle-btn" style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
               <MoreHorizontal size={20} />
             </button>
@@ -52,7 +65,7 @@ export default function Layout() {
               type="text" 
               placeholder="Search" 
               className="sidebar-search-input" 
-              style={{ width: '100%', padding: '10px 12px 10px 38px', borderRadius: '8px', border: '1px solid #f1f5f9', background: '#fff', fontSize: '14px' }}
+              style={{ width: '100%', padding: '10px 12px 10px 38px', borderRadius: '10px', border: '1.5px solid #f1f5f9', background: '#fff', fontSize: '14px', outline: 'none' }}
             />
           </div>
 
@@ -67,16 +80,17 @@ export default function Layout() {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '10px 12px',
-                  borderRadius: '8px',
+                  borderRadius: '10px',
                   textDecoration: 'none',
                   color: isActive ? '#1e293b' : '#64748b',
                   background: isActive ? '#f8fafc' : 'transparent',
-                  fontWeight: '600',
-                  fontSize: '14px'
+                  fontWeight: isActive ? '700' : '600',
+                  fontSize: '14px',
+                  transition: 'all 0.2s ease'
                 })}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <item.icon size={20} />
+                  <item.icon size={20} color={window.location.pathname === item.path ? '#1e293b' : '#64748b'} />
                   <span>{item.label}</span>
                 </div>
                 <ChevronDown size={14} style={{ opacity: 0.5 }} />
@@ -88,42 +102,41 @@ export default function Layout() {
         {/* BOTTOM GROUP: Upgrade Card & Profile */}
         <div className="sidebar-footer-group" style={{ display: 'flex', flexDirection: 'column', gap: '24px', padding: '0 8px' }}>
           
-          {/* Upgrade Card matched to image_b53397.jpg */}
-          <div className="upgrade-card" style={{ background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px', padding: '16px' }}>
+          <div className="upgrade-card" style={{ background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <p style={{ fontSize: '13px', fontWeight: '700', margin: 0, color: '#1e293b' }}>Manage Subscription plan</p>
+              <p style={{ fontSize: '13px', fontWeight: '800', margin: 0, color: '#1e293b' }}>Manage Subscription plan</p>
               <Info size={14} style={{ color: '#94a3b8' }} />
             </div>
-            <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 12px 0', lineHeight: '1.4' }}>
+            <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 16px 0', lineHeight: '1.5' }}>
               You’ve used 80% of your 5 GB storage. Upgrade for more space & features.
             </p>
-            <div style={{ height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden', marginBottom: '12px' }}>
+            <div style={{ height: '8px', background: '#e2e8f0', borderRadius: '10px', overflow: 'hidden', marginBottom: '16px' }}>
               <div style={{ width: '80%', height: '100%', background: '#6366f1' }}></div>
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: '700', color: '#64748b', cursor: 'pointer', padding: 0 }}>Dismiss</button>
-              <button style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: '700', color: '#6366f1', cursor: 'pointer', padding: 0 }}>Upgrade plan</button>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <button style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: '800', color: '#64748b', cursor: 'pointer', padding: 0 }}>Dismiss</button>
+              <button style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: '800', color: '#6366f1', cursor: 'pointer', padding: 0 }}>Upgrade plan</button>
             </div>
           </div>
 
-          {/* Profile Section */}
-          <div className="user-profile-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '20px', borderTop: '1px solid #f1f5f9' }}>
+          <div className="user-profile-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 0 8px 0', borderTop: '1px solid #f1f5f9' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <img 
-                src={`https://ui-avatars.com/api/?name=${userName}&background=f97316&color=fff`} 
+                src={`https://ui-avatars.com/api/?name=${userName}&background=f97316&color=fff&bold=true`} 
                 alt="Avatar" 
-                style={{ width: '40px', height: '40px', borderRadius: '50%' }} 
+                style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid #f1f5f9' }} 
               />
               <div style={{ overflow: 'hidden' }}>
-                <p style={{ fontSize: '14px', fontWeight: '700', margin: 0, color: '#1e293b', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{userName}</p>
+                <p style={{ fontSize: '14px', fontWeight: '800', margin: 0, color: '#1e293b', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{userName}</p>
                 <p style={{ fontSize: '12px', color: '#64748b', margin: 0, whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{userEmail}</p>
               </div>
             </div>
             <button 
-              onClick={() => { localStorage.clear(); navigate("/login"); }} 
-              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
+              onClick={handleLogout} 
+              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              title="Sign Out"
             >
-              <LogOut size={18} />
+              <LogOut size={20} />
             </button>
           </div>
         </div>
