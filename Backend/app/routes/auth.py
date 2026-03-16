@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
-from typing import Literal
+from typing import Literal, Optional
 
 from app.database.db import get_db
 from app.config.settings import settings
@@ -29,30 +29,17 @@ from app.services.otp_service import generate_mfa_otp, verify_mfa_otp
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login/password")
 
-# =========================================================
-# UTIL — GENERATE TEMP PASSWORD
-# =========================================================
 def generate_temp_password():
     chars = string.ascii_letters + string.digits
     return ''.join(secrets.choice(chars) for _ in range(10))
 
-# =========================================================
-# REGISTER
-# =========================================================
 @router.post("/register", status_code=201)
-async def register_user(
-    payload: RegisterRequest,
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(
-        select(User).where(User.email == payload.email)
-    )
-
+async def register_user(payload: RegisterRequest, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.email == payload.email))
     if result.scalars().first():
         raise HTTPException(status_code=400, detail="User already exists")
-
+    
     temp_password = generate_temp_password()
-
     user = User(
         username=payload.username,
         email=payload.email,
@@ -63,215 +50,159 @@ async def register_user(
         is_mfa_enabled=False,
         must_change_password=True
     )
-
     db.add(user)
     await db.commit()
+    return {"message": "User registered successfully", "temporary_password": temp_password}
 
-    return {
-        "message": "User registered successfully",
-        "temporary_password": temp_password
-    }
-
-# =========================================================
-# PASSWORD LOGIN
-# =========================================================
 @router.post("/login/password")
-async def password_login(
-    payload: PasswordLoginRequest,
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(
-        select(User).where(User.email == payload.email)
-    )
+async def password_login(payload: PasswordLoginRequest, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalars().first()
-
+    
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
+    
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Account deactivated")
     
-    # Password Expiry Check (90 Days)
-    if user.password_changed_at and \
-       user.password_changed_at < datetime.now(timezone.utc) - timedelta(days=90):
+    if user.password_changed_at and user.password_changed_at < datetime.now(timezone.utc) - timedelta(days=90):
         return {"status": "PASSWORD_EXPIRED"}
-
-    # Signal Frontend to move to MFA screen
+    
     return {
         "status": "MFA_REQUIRED",
         "email": user.email,
         "available_methods": ["authenticator", "email", "sms"]
     }
 
-# =========================================================
-# SELECT MFA METHOD
-# =========================================================
 class SelectMFARequest(BaseModel):
     email: EmailStr
-    method: Literal["email", "authenticator", "sms"]
+    method: str # Changed to str to prevent 422 errors on casing mismatches
 
 @router.post("/select-mfa")
-async def select_mfa_method(
-    payload: SelectMFARequest,
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(
-        select(User).where(User.email == payload.email)
-    )
+async def select_mfa_method(payload: SelectMFARequest, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalars().first()
-
+    
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
-    user.mfa_method = payload.method
+    
+    # Normalize method to lowercase
+    method_type = payload.method.lower().strip()
+    user.mfa_method = method_type
     await db.commit()
-
-    if payload.method == "email":
-        otp_value = await generate_mfa_otp(db=db, user=user, method="email")
-        return {"message": "Email OTP generated", "dev_otp": otp_value}
-
-    if payload.method == "sms":
-        otp_value = await generate_mfa_otp(db=db, user=user, method="sms")
-        return {"message": "SMS OTP generated", "dev_otp": otp_value}
-
-    if payload.method == "authenticator":
+    
+    if method_type in ["email", "sms"]:
+        if method_type == "sms" and not user.phone_number:
+            raise HTTPException(status_code=400, detail="User has no phone number registered")
+        
+        otp_value = await generate_mfa_otp(db=db, user=user, method=method_type)
+        return {"status": "SUCCESS", "dev_otp": otp_value}
+    
+    if method_type == "authenticator":
         if not user.mfa_secret:
             user.mfa_secret = pyotp.random_base32()
             await db.commit()
-
+        
         totp = pyotp.TOTP(user.mfa_secret)
-        provisioning_url = totp.provisioning_uri(name=user.email, issuer_name="DineVibe")
-
         return {
-            "qr_url": provisioning_url,
+            "status": "SUCCESS",
+            "qr_url": totp.provisioning_uri(name=user.email, issuer_name="DineVibe"),
             "manual_key": user.mfa_secret
         }
+    
+    raise HTTPException(status_code=400, detail="Invalid MFA method provided")
 
-    raise HTTPException(status_code=400, detail="Invalid MFA method")
-
-# =========================================================
-# VERIFY OTP (Includes Dummy Bypass)
-# =========================================================
 @router.post("/verify-otp")
-async def verify_otp_route(
-    payload: OTPVerifyRequest,
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(
-        select(User).where(User.email == payload.email)
-    )
+async def verify_otp_route(payload: OTPVerifyRequest, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalars().first()
-
+    
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # ✅ STEP 1: DUMMY BYPASS — Accept 123456 immediately
+    is_verified = False
+    
+    # Bypass for development or specific MFA types
     if payload.otp == "123456":
-        user.is_mfa_enabled = True
-        user.is_first_login = False
-        await db.commit()
-
-        # Handle password change requirement if necessary
-        if user.must_change_password:
-            return {
-                "status": "MFA_SETUP_COMPLETE",
-                "must_change_password": True,
-                "user": {
-                    "username": user.username,
-                    "email": user.email,
-                    "role": user.role.value
-                }
-            }
-
-        # Issue Production Token
-        access_token, jti, expire = create_access_token(
-            user_id=user.id,
-            role=user.role.value,
-            expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        )
-
-        return {
-            "status": "SUCCESS",
-            "access_token": access_token,
-            "user": {
-                "username": user.username,
-                "email": user.email,
-                "role": user.role.value
-            }
-        }
-
-    # ✅ STEP 2: REAL MFA LOGIC
-    if user.mfa_method == "authenticator":
+        is_verified = True
+    elif user.mfa_method == "authenticator":
         if not user.mfa_secret:
             raise HTTPException(status_code=400, detail="MFA not initialized")
         totp = pyotp.TOTP(user.mfa_secret)
-        if not totp.verify(payload.otp):
-            raise HTTPException(status_code=401, detail="Invalid verification code")
+        is_verified = totp.verify(payload.otp)
     else:
-        # Check against OTP table (SMS/Email)
+        # verify_mfa_otp raises an exception if invalid, otherwise continues
         await verify_mfa_otp(db=db, user=user, otp_code=payload.otp)
+        is_verified = True
 
+    if not is_verified:
+        raise HTTPException(status_code=401, detail="Invalid verification code")
+
+    # Update user status
     user.is_mfa_enabled = True
     user.is_first_login = False
     await db.commit()
 
-    if user.must_change_password:
-        return {"status": "MFA_SETUP_COMPLETE", "must_change_password": True}
+    # Capture the must_change_password status
+    should_reset = user.must_change_password
 
-    access_token, jti, expire = create_access_token(
-        user_id=user.id,
-        role=user.role.value,
+    # If they must reset, stop here so frontend can redirect
+    if should_reset:
+        return {
+            "status": "MFA_SETUP_COMPLETE", 
+            "must_change_password": True, 
+            "email": user.email
+        }
+
+    # Otherwise, generate full access
+    access_token, _, _ = create_access_token(
+        user_id=user.id, 
+        role=str(user.role.value),
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-
+    
     return {
-        "status": "SUCCESS",
-        "access_token": access_token,
-        "role": user.role.value
+        "status": "SUCCESS", 
+        "access_token": access_token, 
+        "role": str(user.role.value), 
+        "user_name": user.username
     }
 
-# =========================================================
-# SET PASSWORD
-# =========================================================
 @router.post("/set-password")
-async def set_password(
-    payload: SetPasswordRequest,
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(
-        select(User).where(User.email == payload.email)
-    )
+async def set_password(payload: SetPasswordRequest, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalars().first()
-
+    
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
-    # Password Reuse Prevention (Last 5)
+    
     history_result = await db.execute(
-        select(PasswordHistory)
-        .where(PasswordHistory.user_id == user.id)
-        .order_by(PasswordHistory.created_at.desc())
-        .limit(5)
+        select(PasswordHistory).where(PasswordHistory.user_id == user.id)
+        .order_by(PasswordHistory.created_at.desc()).limit(5)
     )
     history_entries = history_result.scalars().all()
-
+    
     for entry in history_entries:
         if verify_password(payload.new_password, entry.password_hash):
             raise HTTPException(status_code=400, detail="You cannot reuse your last 5 passwords")
-
+    
     if user.hashed_password:
         db.add(PasswordHistory(user_id=user.id, password_hash=user.hashed_password))
-
+    
     user.hashed_password = hash_password(payload.new_password)
     user.must_change_password = False
     user.password_changed_at = datetime.now(timezone.utc)
-
     await db.commit()
-
-    access_token, jti, expire = create_access_token(
-        user_id=user.id,
-        role=user.role.value,
+    
+    access_token, _, _ = create_access_token(
+        user_id=user.id, 
+        role=str(user.role.value),
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-
-    return {"status": "SUCCESS", "access_token": access_token}
+    
+    return {
+        "status": "SUCCESS", 
+        "access_token": access_token, 
+        "role": str(user.role.value), 
+        "user_name": user.username
+    }
